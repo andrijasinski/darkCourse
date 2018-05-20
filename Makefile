@@ -44,6 +44,9 @@ $(PROGRAM): $(OBJ)
 obj/main.o: src/main.cpp
 	$(CXX) -c src/main.cpp -o obj/main.o $(CXXFLAGS)
 
+prebuild:
+	mkdir bin
+
 clean:
 	rm -f bin/*
 	rm -f lib/*

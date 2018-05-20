@@ -4,6 +4,10 @@
 
 int main(int argc, char const *argv[])
 {
-    std::cout << "hi\n";
-    return 0;
+    srand(time(NULL));
+
+    Character knight ("Knight", 100, 40, 20, false);
+    Character werewolf ("Werewolf", 150, 30, 15, true);
+
+    return EXIT_SUCCESS;
 }
