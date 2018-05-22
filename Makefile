@@ -12,7 +12,7 @@ CXX=clang++
 # Set default compiler parameters
 # -Wall 	shows all warnings when compiling, always use this!
 # -std=c++11 	enables the C++11 standard mode
-CXXFLAGS = -Wall -std=c++11 -Iinclude
+CXXFLAGS = -Wall -std=c++14 -Iinclude
 
 # Compiler flag -Idir specifies, that there are includes in the 'dir' directory
 # LIB_CXXFLAGS = $(CXXFLAGS) -Iinclude
