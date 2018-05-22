@@ -4,6 +4,8 @@
 #include "game.h"
 
 std::vector<Character> createCharacters(char* uc);
+void evaluate(char action, std::vector<Character> players);
+
 
 int main(int argc, char const *argv[])
 {
@@ -28,10 +30,24 @@ int main(int argc, char const *argv[])
     
     std::vector<Character> characters = createCharacters(&userCharacter);
     for(auto c: characters) std::cout << c.toString() << "\n";
+
     return EXIT_SUCCESS;
 }
 
 // FUNCTIONS
+
+void evaluate(char action, std::vector<Character> players){
+    std::vector<Character> newStats;
+    Character attacker = players[0];
+    Character blocker = players[1];
+    if (action == 'a'){ // attack
+        blocker.applyDamage(attacker.attack());
+    } else // heal
+    {
+        /* code */
+    }
+    
+}
 
 std::vector<Character> createCharacters(char* uc){
     if (*uc == 'a') {
@@ -40,15 +56,15 @@ std::vector<Character> createCharacters(char* uc){
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
-    else if(*uc == 'k') {
-        Character knight ("Knight", 100, 40, 20, true);
+    else if (*uc == 'k') {
+        Character knight ("Knight", 100, 40, 20, false);
         Character werewolf ("Werewolf", 150, 30, 15, true);
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
     else {
         Character knight ("Knight", 100, 40, 20, true);
-        Character werewolf ("Werewolf", 150, 30, 15, true);
+        Character werewolf ("Werewolf", 150, 30, 15, false);
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
