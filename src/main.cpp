@@ -4,8 +4,7 @@
 #include "game.h"
 
 std::vector<Character> createCharacters(char* uc);
-void evaluate(char action, std::vector<Character> players);
-
+std::vector<Character> evaluate(char action, Character attacker, Character blocker);
 
 int main(int argc, char const *argv[])
 {
@@ -29,43 +28,87 @@ int main(int argc, char const *argv[])
     }
     
     std::vector<Character> characters = createCharacters(&userCharacter);
-    for(auto c: characters) std::cout << c.toString() << "\n";
+    Character chr1 = characters[0];
+    Character chr2 = characters[1];
+
+    keys = {'a', 'h'};
+    while(chr1.health > 0 && chr2.health > 0){
+        if (chr1.ai) {
+            /* code */
+        } else {
+            while (true) {
+                std::cout << "Press [a] to attack or [h] to heal\n";
+                std::cin >> userCharacter;
+                if (std::cin.fail() || std::find(keys.begin(), keys.end(), userCharacter) == keys.end()) {
+                    std::cin.clear(); std::cin.ignore();
+                    std::cout << "Re-enter a valid value! \n";
+                } else break;
+            }
+            if (userCharacter == 'a') {
+                std::cout << chr1.name + " attacks. ";
+                std::cout << chr2.applyDamage(chr1.attack()) << "\n";
+            } else {
+                std::cout << chr1.name + " decided to heal. ";
+                std::cout << chr1.heal() << "\n";
+            }
+        }
+        if (chr2.ai) {
+            /* code */
+        } else {
+            while (true) {
+                std::cout << "Press [a] to attack or [h] to heal\n";
+                std::cin >> userCharacter;
+                if (std::cin.fail() || std::find(keys.begin(), keys.end(), userCharacter) == keys.end()) {
+                    std::cin.clear(); std::cin.ignore();
+                    std::cout << "Re-enter a valid value! \n";
+                } else break;
+            }
+            if (userCharacter == 'a') {
+                std::cout << chr1.name + " attacks. ";
+                std::cout << chr2.applyDamage(chr1.attack()) << "\n";
+            } else {
+                std::cout << chr1.name + " decided to heal. ";
+                std::cout << chr1.heal() << "\n";
+            }
+        }
+        
+    }
+    
 
     return EXIT_SUCCESS;
 }
 
 // FUNCTIONS
 
-void evaluate(char action, std::vector<Character> players){
+std::vector<Character> evaluate(char action, Character attacker, Character blocker){
     std::vector<Character> newStats;
-    Character attacker = players[0];
-    Character blocker = players[1];
     if (action == 'a'){ // attack
         blocker.applyDamage(attacker.attack());
     } else // heal
     {
-        /* code */
+        attacker.heal();
     }
-    
+    std::vector<Character> chrs = {attacker, blocker};
+    return chrs;
 }
 
 std::vector<Character> createCharacters(char* uc){
     if (*uc == 'a') {
-        Character knight ("Knight", 100, 40, 20, true);
+        Character knight ("Knight", 100, 35, 20, true);
         Character werewolf ("Werewolf", 150, 30, 15, true);
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
     else if (*uc == 'k') {
-        Character knight ("Knight", 100, 40, 20, false);
+        Character knight ("Knight", 100, 35, 20, false);
         Character werewolf ("Werewolf", 150, 30, 15, true);
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
     else {
-        Character knight ("Knight", 100, 40, 20, true);
+        Character knight ("Knight", 100, 35, 20, true);
         Character werewolf ("Werewolf", 150, 30, 15, false);
-        std::vector<Character> chr = {knight, werewolf};
+        std::vector<Character> chr = {werewolf, knight};
         return chr;
     }
 }
