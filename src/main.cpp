@@ -4,7 +4,9 @@
 #include "game.h"
 
 std::vector<Character> createCharacters(char* uc);
-std::vector<Character> evaluate(char action, Character attacker, Character blocker);
+int evaluate(Character, Character);
+char findBestMove(Character, Character);
+int minimax(Character, Character, int, bool);
 
 int main(int argc, char const *argv[])
 {
@@ -33,8 +35,17 @@ int main(int argc, char const *argv[])
 
     keys = {'a', 'h'};
     while(chr1.health > 0 && chr2.health > 0){
+        std::cout << std::string(25, '=') << "\n";
+
         if (chr1.ai) {
-            /* code */
+            char action = findBestMove(chr1, chr2);
+            if (action == 'a') {
+                std::cout << chr1.name + " attacks. ";
+                std::cout << chr2.applyDamage(chr1.attack()) << "\n";
+            } else {
+                std::cout << chr1.name + " decided to heal. ";
+                std::cout << chr1.heal() << "\n";
+            }
         } else {
             while (true) {
                 std::cout << "Press [a] to attack or [h] to heal\n";
@@ -52,8 +63,16 @@ int main(int argc, char const *argv[])
                 std::cout << chr1.heal() << "\n";
             }
         }
+        if (chr1.health <= 0 || chr2.health <= 0) break;
         if (chr2.ai) {
-            /* code */
+            char action = findBestMove(chr2, chr1);
+            if (action == 'a') {
+                std::cout << chr2.name + " attacks. ";
+                std::cout << chr1.applyDamage(chr2.attack()) << "\n";
+            } else {
+                std::cout << chr2.name + " decided to heal. ";
+                std::cout << chr2.heal() << "\n";
+            }
         } else {
             while (true) {
                 std::cout << "Press [a] to attack or [h] to heal\n";
@@ -64,11 +83,11 @@ int main(int argc, char const *argv[])
                 } else break;
             }
             if (userCharacter == 'a') {
-                std::cout << chr1.name + " attacks. ";
-                std::cout << chr2.applyDamage(chr1.attack()) << "\n";
+                std::cout << chr2.name + " attacks. ";
+                std::cout << chr1.applyDamage(chr2.attack()) << "\n";
             } else {
-                std::cout << chr1.name + " decided to heal. ";
-                std::cout << chr1.heal() << "\n";
+                std::cout << chr2.name + " decided to heal. ";
+                std::cout << chr2.heal() << "\n";
             }
         }
         
@@ -80,32 +99,83 @@ int main(int argc, char const *argv[])
 
 // FUNCTIONS
 
-std::vector<Character> evaluate(char action, Character attacker, Character blocker){
-    std::vector<Character> newStats;
-    if (action == 'a'){ // attack
-        blocker.applyDamage(attacker.attack());
-    } else // heal
-    {
-        attacker.heal();
+char findBestMove(Character chr1, Character chr2){
+    int bestVal = -1000;
+    char action;
+    Character chr1_copy ("1", chr1.health, chr1.getMaxAttack(), chr1.getMaxBlock(), chr1.ai); 
+    Character chr2_copy ("2", chr2.health, chr2.getMaxAttack(), chr2.getMaxBlock(), chr2.ai); 
+
+    chr2_copy.applyDamage(chr1_copy.attack());
+    int moveVal = minimax(chr1_copy, chr2_copy, 0, false);
+    if (moveVal > bestVal){
+        bestVal = moveVal;
+        action = 'a';
     }
-    std::vector<Character> chrs = {attacker, blocker};
-    return chrs;
+
+    Character chr2_copy_reset ("2", chr2.health, chr2.getMaxAttack(), chr2.getMaxBlock(), chr2.ai); 
+    chr1_copy.heal();
+    moveVal = minimax(chr1_copy, chr2_copy_reset, 0, false);
+    if (moveVal > bestVal){
+        action = 'h';
+    }
+    return action;
+
+}
+int minimax(Character chr1, Character chr2, int depth, bool isMax){
+    int score = evaluate(chr1, chr2);
+    if (score == 10 || score == -10 || score == 0) return score;
+
+    
+    if (isMax) {
+        int best = -1000;
+        Character chr1_copy ("1", chr1.health, chr1.getMaxAttack(), chr1.getMaxBlock(), chr1.ai); 
+        Character chr2_copy ("2", chr2.health, chr2.getMaxAttack(), chr2.getMaxBlock(), chr2.ai); 
+        chr2_copy.applyDamage(chr1_copy.attack());
+        best = std::max(best, minimax(chr1_copy, chr2_copy, depth+1, !isMax));
+        
+        Character chr2_copy_reset ("2", chr2.health, chr2.getMaxAttack(), chr2.getMaxBlock(), chr2.ai); 
+        chr1_copy.heal();
+        best = std::max(best, minimax(chr1_copy, chr2_copy_reset, depth+1, !isMax));
+        return best;
+    }
+    else {
+        int best = 1000;
+        Character chr1_copy ("1", chr1.health, chr1.getMaxAttack(), chr1.getMaxBlock(), chr1.ai); 
+        Character chr2_copy ("2", chr2.health, chr2.getMaxAttack(), chr2.getMaxBlock(), chr2.ai); 
+        chr2_copy.applyDamage(chr1_copy.attack());
+        best = std::min(best, minimax(chr1_copy, chr2_copy, depth+1, !isMax));
+        
+        Character chr2_copy_reset ("2", chr2.health, chr2.getMaxAttack(), chr2.getMaxBlock(), chr2.ai); 
+        chr1_copy.heal();
+        best = std::min(best, minimax(chr1_copy, chr2_copy_reset, depth+1, !isMax));
+        return best;
+    }
+    
+}
+
+int evaluate(Character chr1, Character chr2){
+    if (chr1.health < 0) return -10;
+    if (chr2.health < 0) return 10;
+    return 0;
 }
 
 std::vector<Character> createCharacters(char* uc){
     if (*uc == 'a') {
+        std::cout << "Knight and Werewolf are going to fight each other!\n";
         Character knight ("Knight", 100, 35, 20, true);
         Character werewolf ("Werewolf", 150, 30, 15, true);
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
     else if (*uc == 'k') {
+        std::cout << "You are playing as a honourable Knight!\n";
         Character knight ("Knight", 100, 35, 20, false);
         Character werewolf ("Werewolf", 150, 30, 15, true);
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
     else {
+        std::cout << "You are playing as a mighty Werewolf!\n";
         Character knight ("Knight", 100, 35, 20, true);
         Character werewolf ("Werewolf", 150, 30, 15, false);
         std::vector<Character> chr = {werewolf, knight};

@@ -19,6 +19,8 @@ public:
     std::string applyDamage(int);
     std::string heal();
     std::string toString();
+    int getMaxAttack();
+    int getMaxBlock();
 };
 
 Character::Character(std::string name, int health, int maxAttack, int maxBlock, bool ai){
@@ -71,5 +73,12 @@ std::string Character::toString(){
     return name + "'s health is " + std::to_string(health) + ".";
 }
 
+int Character::getMaxAttack(){
+    return this->maxAttack;
+}
+
+int Character::getMaxBlock(){
+    return this->maxBlock;
+}
 
 #endif
