@@ -1,16 +1,18 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <stdlib.h>
+#include <time.h>
 #include "game.h"
 
-std::vector<Character> createCharacters(char* uc);
+std::vector<Character> createCharacters(char* ua);
 int evaluate(Character, Character);
 char findBestMove(Character, Character);
 int minimax(Character, Character, int, bool, int);
 
 int main(int argc, char const *argv[])
 {
-    srand(time(NULL));
+    std::srand(std::time(NULL));
     std::cout << "Welcome to \"darkCourse\" game! Please, choose your character or let fight on their own!\n";
     std::vector<char> keys = {'k', 'w', 'a'};
     std::vector<std::string> options = {
@@ -18,18 +20,18 @@ int main(int argc, char const *argv[])
         "press [w] to play as a Werewolf",
         "press [a] to let AI show it's power!"
     };
-    char userCharacter;
+    char userAction;
     while (true) {
         std::cout << "Available options:\n";
         for(auto option: options) std::cout << option << "\n";
-        std::cin >> userCharacter;
-        if (std::cin.fail() || std::find(keys.begin(), keys.end(), userCharacter) == keys.end()) {
+        std::cin >> userAction;
+        if (std::cin.fail() || std::find(keys.begin(), keys.end(), userAction) == keys.end()) {
             std::cin.clear(); std::cin.ignore();
             std::cout << "Re-enter a valid value! ";
         } else break;
     }
     
-    std::vector<Character> characters = createCharacters(&userCharacter);
+    std::vector<Character> characters = createCharacters(&userAction);
     Character chr1 = characters[0];
     Character chr2 = characters[1];
 
@@ -49,13 +51,13 @@ int main(int argc, char const *argv[])
         } else {
             while (true) {
                 std::cout << "Press [a] to attack or [h] to heal\n";
-                std::cin >> userCharacter;
-                if (std::cin.fail() || std::find(keys.begin(), keys.end(), userCharacter) == keys.end()) {
+                std::cin >> userAction;
+                if (std::cin.fail() || std::find(keys.begin(), keys.end(), userAction) == keys.end()) {
                     std::cin.clear(); std::cin.ignore();
                     std::cout << "Re-enter a valid value! \n";
                 } else break;
             }
-            if (userCharacter == 'a') {
+            if (userAction == 'a') {
                 std::cout << chr1.name + " attacks. ";
                 std::cout << chr2.applyDamage(chr1.attack()) << "\n";
             } else {
@@ -76,13 +78,13 @@ int main(int argc, char const *argv[])
         } else {
             while (true) {
                 std::cout << "Press [a] to attack or [h] to heal\n";
-                std::cin >> userCharacter;
-                if (std::cin.fail() || std::find(keys.begin(), keys.end(), userCharacter) == keys.end()) {
+                std::cin >> userAction;
+                if (std::cin.fail() || std::find(keys.begin(), keys.end(), userAction) == keys.end()) {
                     std::cin.clear(); std::cin.ignore();
                     std::cout << "Re-enter a valid value! \n";
                 } else break;
             }
-            if (userCharacter == 'a') {
+            if (userAction == 'a') {
                 std::cout << chr2.name + " attacks. ";
                 std::cout << chr1.applyDamage(chr2.attack()) << "\n";
             } else {
@@ -126,8 +128,7 @@ int minimax(Character chr1, Character chr2, int depth, bool isMax, int maxDepth)
         chr1_copy.heal();
         best = std::max(best, minimax(chr1_copy, chr2_copy_reset, depth+1, !isMax, maxDepth));
         return best;
-    }
-    else {
+    } else {
         int best = 1000;
         Character chr1_copy ("1", chr1.health, chr1.getMaxAttack(), chr1.getMaxBlock(), chr1.ai); 
         Character chr2_copy ("2", chr2.health, chr2.getMaxAttack(), chr2.getMaxBlock(), chr2.ai); 
@@ -147,25 +148,27 @@ int evaluate(Character chr1, Character chr2){
     return chr1.health - chr2.health;
 }
 
-std::vector<Character> createCharacters(char* uc){
-    if (*uc == 'a') {
+std::vector<Character> createCharacters(char* ua){
+    Character knight ("Knight", 100, 50, 20, true);
+    Character werewolf ("Werewolf", 250, 30, 15, true);
+    if (*ua == 'a') {
         std::cout << "Knight and Werewolf are going to fight each other!\n";
-        Character knight ("Knight", 100, 35, 20, true);
-        Character werewolf ("Werewolf", 150, 30, 15, true);
         std::vector<Character> chr = {knight, werewolf};
+        int r = std::rand() % 10;
+        if (r < 5) {
+            chr = {werewolf, knight};
+        }
         return chr;
     }
-    else if (*uc == 'k') {
+    else if (*ua == 'k') {
         std::cout << "You are playing as a honourable Knight!\n";
-        Character knight ("Knight", 100, 35, 20, false);
-        Character werewolf ("Werewolf", 150, 30, 15, true);
+        knight.ai = false;
         std::vector<Character> chr = {knight, werewolf};
         return chr;
     }
     else {
         std::cout << "You are playing as a mighty Werewolf!\n";
-        Character knight ("Knight", 100, 35, 20, true);
-        Character werewolf ("Werewolf", 150, 30, 15, false);
+        werewolf.ai = false;
         std::vector<Character> chr = {werewolf, knight};
         return chr;
     }
