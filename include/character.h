@@ -44,12 +44,12 @@ std::string Character::applyDamage(int damage){
     int blockedDamage = damage - block();
     std::string message;
     if (health - blockedDamage <= 0){
-        health = -1;
-        message = name +" received " + std::to_string(blockedDamage) + " points of damage. ";
+        health = 0;
+        message = name +" received " + std::to_string(blockedDamage) + " points of damage.";
         message += name + " died.";
     } else if (blockedDamage > 0) {
         health -= blockedDamage;
-        message = name + " received " + std::to_string(blockedDamage) + " points of damage. " + toString();
+        message = name + " received " + std::to_string(blockedDamage) + " points of damage.";
     } else {
         message = name + " blocked attack!";
     }
@@ -64,7 +64,6 @@ std::string Character::heal(){
         message = name + " fully restored his health!";
     } else {
         health += toHeal;
-        message = toString();
     }
     return message;
 }

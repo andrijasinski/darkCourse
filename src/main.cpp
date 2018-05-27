@@ -13,7 +13,7 @@ int minimax(Character, Character, int, bool, int);
 int main(int argc, char const *argv[])
 {
     std::srand(std::time(NULL));
-    std::cout << "Welcome to \"darkCourse\" game! Please, choose your character or let fight on their own!\n";
+    std::cout << "Welcome to \"darkCourse\" game! Please, choose your character or let them fight on their own!\n";
     std::vector<char> keys = {'k', 'w', 'a'};
     std::vector<std::string> options = {
         "press [k] to play as a Knight",
@@ -91,7 +91,11 @@ int main(int argc, char const *argv[])
                 std::cout << chr2.name + " decided to heal. ";
                 std::cout << chr2.heal() << "\n";
             }
-        }   
+        }
+        if (chr1.health > 0 && chr2.health > 0) {
+            std::cout << chr1.toString() << "\n";
+            std::cout << chr2.toString() << "\n";   
+        }
     }
     return EXIT_SUCCESS;
 }
@@ -143,13 +147,13 @@ int minimax(Character chr1, Character chr2, int depth, bool isMax, int maxDepth)
 }
 
 int evaluate(Character chr1, Character chr2){
-    if (chr1.health < 0) return -10;
-    if (chr2.health < 0) return 10;
+    if (chr1.health <= 0) return -10;
+    if (chr2.health <= 0) return 10;
     return chr1.health - chr2.health;
 }
 
 std::vector<Character> createCharacters(char* ua){
-    Character knight ("Knight", 100, 50, 20, true);
+    Character knight ("Knight", 100, 45, 20, true);
     Character werewolf ("Werewolf", 250, 30, 15, true);
     if (*ua == 'a') {
         std::cout << "Knight and Werewolf are going to fight each other!\n";
