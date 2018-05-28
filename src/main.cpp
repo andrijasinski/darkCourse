@@ -115,8 +115,8 @@ char findBestMove(Character chr1, Character chr2){
 
     char action = (healVal > attackVal) ? 'h' : 'a';
     return action;
-
 }
+
 int minimax(Character chr1, Character chr2, int depth, bool isMax, int maxDepth){
     int score = evaluate(chr1, chr2);
     if (score == 10 || score == -10 || depth == maxDepth) return score;
